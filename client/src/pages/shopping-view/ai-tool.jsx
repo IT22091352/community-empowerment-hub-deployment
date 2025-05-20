@@ -764,7 +764,9 @@ const handleDownloadReport = () => {
   doc.text('EXECUTIVE SUMMARY', pageWidth / 2, 172, { align: 'center' });
   
   // Extract growth percentage from the text using regex
-  const growthValue = analysisResults.summaryMetrics.growthPotential.match(/\d+/)?.[0] || "N/A";
+  // Add null check to prevent TypeError
+  const growthPotential = analysisResults?.summaryMetrics?.growthPotential || '';
+  const growthValue = typeof growthPotential === 'string' ? (growthPotential.match(/\d+/)?.[0] || "N/A") : "N/A";
   
   doc.setFontSize(12);
   doc.setFont('helvetica', 'normal');
@@ -773,7 +775,7 @@ const handleDownloadReport = () => {
   // Add key metrics in an organized manner
   const metrics = [
     { key: 'Growth Potential', value: `${growthValue}% revenue increase over 6 months` },
-    { key: 'Primary Challenge', value: analysisResults.summaryMetrics.primaryChallenge },
+    { key: 'Primary Challenge', value: analysisResults?.summaryMetrics?.primaryChallenge || 'Not available' },
     { key: 'Recommendation', value: analysisResults.summaryMetrics.topRecommendation },
     { key: 'Market Position', value: analysisResults.summaryMetrics.marketPosition }
   ];
@@ -1946,14 +1948,13 @@ const renderFinancialProjections = () => {
                     </svg>
                   </div>
                   <div>
-                    <h4 className="font-bold text-lg text-gray-800">{t('Growth Potential')}</h4>
-                    <p className="text-xl font-semibold text-green-600">
+                    <h4 className="font-bold text-lg text-gray-800">{t('Growth Potential')}</h4>                    <p className="text-xl font-semibold text-green-600">
                       {/* Extract just the number from the growth potential text using regex */}
-                      {analysisResults.summaryMetrics.growthPotential.match(/\d+/)?.[0] || "N/A"}
+                      {(analysisResults?.summaryMetrics?.growthPotential || '').match(/\d+/)?.[0] || "N/A"}
                       <span className="text-green-600 font-bold">%</span>
                       <span className="text-sm font-normal text-gray-600 ml-2">{t('revenue increase over 6 months')}</span>
                       <span className="text-xs ml-1 text-gray-500">
-                        ({analysisResults.summaryMetrics.growthPotential.match(/\(\d+-\d+\%\)/)?.[0]?.replace(/[()]/g, '') || ""})
+                        {(analysisResults?.summaryMetrics?.growthPotential || '').match(/\(\d+-\d+\%\)/)?.[0]?.replace(/[()]/g, '') || ""}
                       </span>
                     </p>
                     <p className="text-xs mt-1 text-gray-500 italic">

@@ -1,25 +1,10 @@
-import axios from 'axios';
 import { API_URL } from '../config/apiConfig';
+import { createAuthenticatedAPI } from '../utils/api-helpers';
 
 const USER_API_URL = `${API_URL}/user`;
 
-// Create axios instance with auth header
-const authAPI = axios.create({
-  baseURL: USER_API_URL,
-  withCredentials: true // Important for cookies if using cookie auth
-});
-
-// Add auth token to requests
-authAPI.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+// Create axios instance with auth header using our helper
+const authAPI = createAuthenticatedAPI(USER_API_URL);
 
 // Get user profile
 export const getUserProfile = async () => {

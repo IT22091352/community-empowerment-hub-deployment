@@ -6,14 +6,7 @@ The application is deployed at: https://community-empowerment-hub-313ac18da07a.h
 ## Deployment Steps
 
 1. **Set Environment Variables on Heroku**
-   ```bash
-   heroku config:set MONGODB_URI=mongodb+srv://4warriors:4warriors@cluster0.14rms.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0 --app community-empowerment-hub
-   heroku config:set JWT_SECRET=4warriors --app community-empowerment-hub
-   heroku config:set NODE_ENV=production --app community-empowerment-hub
-   heroku config:set CLOUDINARY_CLOUD_NAME=dqnmkhaow --app community-empowerment-hub
-   heroku config:set CLOUDINARY_API_KEY=527893798379867 --app community-empowerment-hub
-   heroku config:set CLOUDINARY_API_SECRET=IEvF81w1zbw5oJRK4MVZLV3L06A --app community-empowerment-hub
-   ```
+  
 
 2. **Push to Heroku**
    ```bash
@@ -35,6 +28,30 @@ If you encounter issues with module dependencies:
 3. If seedrandom errors occur, check that the compatibility files are working correctly
 
 ## API Configuration
+
+The application uses a dynamic API configuration system:
+
+1. In production, API calls automatically use the current domain 
+2. Environmental detection is used to determine if running on Heroku
+3. Client-side env-config.js provides runtime configuration
+4. API health endpoints are available at `/api/health/health` and `/api/health/info`
+
+## Connection Issues Fixes
+
+If you encounter "ERR_CONNECTION_REFUSED" errors:
+
+1. The application uses dynamic API URL detection
+2. Check browser console for API connectivity diagnostics
+3. Verify CORS is properly configured in server.js
+4. Test API connectivity by visiting: `https://community-empowerment-hub-313ac18da07a.herokuapp.com/api/health/health`
+
+## TypeError Fixes
+
+For "Cannot read properties of undefined (reading 'match')" errors:
+
+1. Null checking has been added to all code using `.match()` method
+2. The AI Tool component properly checks for missing analysis results
+3. Proper fallbacks are provided for undefined values
 
 The API base URL is: `https://community-empowerment-hub-313ac18da07a.herokuapp.com/api`
 

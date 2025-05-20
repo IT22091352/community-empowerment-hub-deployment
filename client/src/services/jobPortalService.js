@@ -1,23 +1,9 @@
 import axios from 'axios';
 import { API_URL } from '../config/apiConfig';
+import { createAuthenticatedAPI } from '../utils/api-helpers';
 
 // Create axios instance with auth header
-const authAPI = axios.create({
-  baseURL: API_URL,
-  withCredentials: true // Important for cookies if using cookie auth
-});
-
-// Add auth token to requests
-authAPI.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+const authAPI = createAuthenticatedAPI(API_URL);
 
 // Job endpoints
 export const fetchAllJobs = async (filters = {}) => {
