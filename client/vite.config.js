@@ -12,5 +12,19 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['jspdf', 'jspdf-autotable']
+  },
+  build: {
+    commonjsOptions: {
+      include: [/node_modules/],
+    },
+    rollupOptions: {
+      external: ['seedrandom'],
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          tensorflow: ['@tensorflow/tfjs']
+        }
+      }
+    }
   }
 })
