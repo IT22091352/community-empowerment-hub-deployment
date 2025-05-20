@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "Monorepo for client and server",
   "scripts": {
-    "start": "npm start --prefix server",
-    "heroku-postbuild": "npm install --prefix client && npm run build --prefix client"
-  },
+  "start": "npm start --prefix server",
+  "heroku-postbuild": "npm install --prefix client && npx vite build --prefix client"
+},
   "engines": {
-    "node": ">=18.0.0"
-  }
+  "node": "18.x"
+}
 }
