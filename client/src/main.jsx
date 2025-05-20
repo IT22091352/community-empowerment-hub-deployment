@@ -5,6 +5,8 @@ import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "./store/store.js";
 import { Toaster } from "./components/ui/toaster.jsx";
+// Import TensorFlow compatibility module
+import './utils/tfjs-compat.js';
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>

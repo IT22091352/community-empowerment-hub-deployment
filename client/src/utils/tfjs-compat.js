@@ -1,2 +1,7 @@
 // This file provides compatibility for TensorFlow.js and its dependencies
-export default {};
+import seedrandom from './seedrandom-shim';
+
+// Ensure seedrandom is loaded before TensorFlow.js
+export default {
+  seedrandom
+};

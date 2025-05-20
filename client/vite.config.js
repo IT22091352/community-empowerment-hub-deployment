@@ -12,13 +12,13 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['jspdf', 'jspdf-autotable']
-  },
-  build: {
+  },  build: {
     commonjsOptions: {
       include: [/node_modules/],
     },
     rollupOptions: {
-      external: ['seedrandom'],
+      // Remove seedrandom from external dependencies so it's bundled
+      external: [],
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
