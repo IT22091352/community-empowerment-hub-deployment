@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Monorepo for client and server",
   "scripts": {
-    "start": "npm --prefix backend start",
-    "heroku-postbuild": "npm --prefix frontend install --legacy-peer-deps && npm --prefix frontend run build"  },
-    
+    "start": "npm --prefix server start",
+    "heroku-postbuild": "npm --prefix client install --legacy-peer-deps && npm --prefix client run build"
+  },    
   "engines": {
     "node": "18.x"
   }
