@@ -26,6 +26,7 @@ import SearchProducts from "./pages/shopping-view/search";
 import LandingPage from "./pages/shopping-view/landing";
 import AIBusinessAdvisorTool from "./pages/shopping-view/ai-tool";
 import JobPortal from "./pages/shopping-view/jobportal";
+import ApiHealthIndicator from "./components/common/ApiHealthIndicator";
 
 
 function App() {
@@ -46,6 +47,9 @@ function App() {
 
   return (
     <div className="flex flex-col overflow-hidden bg-white">
+      {/* API Health Indicator - Shows API connectivity status */}
+      <ApiHealthIndicator />
+      
       <Routes>
         <Route
           path="/"

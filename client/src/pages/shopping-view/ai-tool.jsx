@@ -771,13 +771,12 @@ const handleDownloadReport = () => {
   doc.setFontSize(12);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(...colors.text);
-  
-  // Add key metrics in an organized manner
+    // Add key metrics in an organized manner
   const metrics = [
     { key: 'Growth Potential', value: `${growthValue}% revenue increase over 6 months` },
     { key: 'Primary Challenge', value: analysisResults?.summaryMetrics?.primaryChallenge || 'Not available' },
-    { key: 'Recommendation', value: analysisResults.summaryMetrics.topRecommendation },
-    { key: 'Market Position', value: analysisResults.summaryMetrics.marketPosition }
+    { key: 'Recommendation', value: analysisResults?.summaryMetrics?.topRecommendation || 'Not available' },
+    { key: 'Market Position', value: analysisResults?.summaryMetrics?.marketPosition || 'Not available' }
   ];
   
   let metricY = 180;

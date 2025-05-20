@@ -4,8 +4,10 @@
  * This module runs automated diagnostics when the app starts to help
  * identify and troubleshoot common issues, especially in production.
  */
-import { API_URL } from '../config/apiConfig';
+import axios from 'axios';
+import { API_URL, LOCAL_API_URL, PRODUCTION_API_URL } from '../config/apiConfig';
 import { testAPIConnection } from './api-helpers';
+import { isProduction, getApiUrl } from './api-constants';
 
 // Tests we want to run at startup
 const diagnostics = [
@@ -15,6 +17,8 @@ const diagnostics = [
       const result = { 
         success: true,
         apiUrl: API_URL,
+        localApiUrl: LOCAL_API_URL,
+        productionApiUrl: PRODUCTION_API_URL,
         info: 'API URL properly configured'
       };
       
@@ -22,7 +26,8 @@ const diagnostics = [
       if (!API_URL) {
         result.success = false;
         result.info = 'API URL is undefined';
-      } else if (API_URL.includes('localhost') && window.location.hostname !== 'localhost') {
+      } else if (API_URL.includes('localhost') && typeof window !== 'undefined' && 
+          window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
         result.success = false;
         result.info = `API URL (${API_URL}) points to localhost but app is running on ${window.location.hostname}`;
       }
