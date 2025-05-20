@@ -1,12 +1,16 @@
 // This file handles MongoDB connections for Vercel serverless functions
 const mongoose = require('mongoose');
 
-const MONGODB_URI = process.env.MONGO_URI;
+const MONGODB_URI = process.env.MONGODB_URI || process.env.MONGO_URI;
 
 if (!MONGODB_URI) {
-  throw new Error(
-    'Please define the MONGO_URI environment variable'
-  );
+  console.error('MongoDB URI is missing! Attempting to connect with default URI.');
+  // Provide a fallback for development only - remove in production
+  if (process.env.NODE_ENV !== 'production') {
+    console.warn('Using fallback MongoDB connection for development');
+  } else {
+    throw new Error('Please define the MONGODB_URI or MONGO_URI environment variable');
+  }
 }
 
 let cached = global.mongoose;

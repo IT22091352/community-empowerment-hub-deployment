@@ -32,7 +32,16 @@ dbConnect()
   .then(() => console.log("MongoDB connected successfully"))
   .catch((error) => {
     console.error("MongoDB connection error:", error);
+    // Log more details about the error for debugging
+    if (error.name === 'MongoServerSelectionError') {
+      console.error("MongoDB connection timeout. Check network or credentials.");
+    }
   });
+
+// Log environment details for debugging
+console.log("Node Environment:", process.env.NODE_ENV);
+console.log("Port:", process.env.PORT);
+console.log("MongoDB URI exists:", !!process.env.MONGO_URI);
 
 const app = express();
 
@@ -65,10 +74,13 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 
-// Error handling middleware
+// Body parser error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Something broke!');
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    console.error('Bad JSON', err);
+    return res.status(400).json({ error: 'Invalid JSON' });
+  }
+  next(err);
 });
 
 // Route middlewares
@@ -90,6 +102,25 @@ app.use('/api/applications', applicationRoutes);
 app.use('/api/user', userRouter);
 
 app.use("/api/reviews", require("./routes/shop/review-routes"));
+
+// 404 Not Found middleware
+app.use((req, res, next) => {
+  res.status(404).json({ error: `Cannot ${req.method} ${req.url}` });
+});
+
+// Global error handling middleware (should be last)
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err.stack || err);
+  const statusCode = err.statusCode || 500;
+  const message = process.env.NODE_ENV === 'production' 
+    ? 'An unexpected error occurred' 
+    : (err.message || 'Internal Server Error');
+  
+  res.status(statusCode).json({
+    error: message,
+    stack: process.env.NODE_ENV === 'production' ? undefined : err.stack
+  });
+});
 
 // Start the server
 app.listen(PORT, () => console.log(`Server is now running on port ${PORT}`));
