@@ -81,6 +81,10 @@ app.use(
   })
 );
 
+console.log("CORS Configuration:", process.env.NODE_ENV === "production" 
+  ? ["https://community-empowerment-hub-313ac18da07a.herokuapp.com", "https://community-empowerment-hub.herokuapp.com"] 
+  : "http://localhost:5173");
+
 app.use(cookieParser());
 app.use(express.json());
 
