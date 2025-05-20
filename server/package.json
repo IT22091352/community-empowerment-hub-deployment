@@ -8,7 +8,7 @@
   "server": "nodemon server.js",
   "client": "cd ../client && npm run dev",
   "dev": "concurrently \"npm run server\" \"npm run client\"",
-  "heroku-postbuild": "cd ../client && npm install && npm run build"
+  "heroku-postbuild": "cd ../client && npm install && npx vite build"
 },
   "author": "QuardX",
   "license": "ISC",
@@ -31,6 +31,6 @@
   }
   ,
   "engines": {
-    "node": ">=18.0.0"
+    "node": "18.x"
   }
 }
