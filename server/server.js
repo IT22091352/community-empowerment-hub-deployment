@@ -29,6 +29,9 @@ const jobRoutes = require('./routes/jobRoutes');
 const applicationRoutes = require('./routes/applicationRoutes');
 const userRouter = require('./routes/userRoutes');
 
+// Import configuration check routes
+const configRoutes = require('./routes/common/config-routes');
+
 console.log("Connecting to MongoDB...");
 
 // Connect to MongoDB
@@ -62,7 +65,9 @@ const PORT = process.env.PORT || 5000;
 // Standard CORS configuration
 app.use(
   cors({
-    origin: process.env.NODE_ENV === "production" ? true : "http://localhost:5173",
+    origin: process.env.NODE_ENV === "production" 
+      ? ["https://community-empowerment-hub-313ac18da07a.herokuapp.com", "https://community-empowerment-hub.herokuapp.com"] 
+      : "http://localhost:5173",
     methods: ["GET", "POST", "DELETE", "PUT"],
     allowedHeaders: [
       "Content-Type",
@@ -106,6 +111,9 @@ app.use('/api/applications', applicationRoutes);
 app.use('/api/user', userRouter);
 
 app.use("/api/reviews", require("./routes/shop/review-routes"));
+
+// Configuration check route
+app.use("/api/system", configRoutes);
 
 // 404 Not Found middleware
 app.use((req, res, next) => {
