@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { testAPIConnection } from '../utils/api-helpers';
+import { createAuthenticatedAPI, testAPIConnection } from '@/utils/api-helpers';
 import { API_URL, LOCAL_API_URL, PRODUCTION_API_URL } from '../config/apiConfig';
 
 /**
