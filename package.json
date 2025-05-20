@@ -4,7 +4,7 @@
   "description": "Monorepo for client and server",
   "scripts": {
     "start": "npm --prefix server start",
-    "heroku-postbuild": "npm --prefix client install --legacy-peer-deps && npm --prefix client run build"
+    "heroku-postbuild": "npm --prefix server install && npm --prefix client install --legacy-peer-deps && npm --prefix client run build"
   },    
   "engines": {
     "node": "18.x"

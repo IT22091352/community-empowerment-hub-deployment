@@ -1,4 +1,8 @@
-require('dotenv').config();
+try {
+  require('dotenv').config();
+} catch (err) {
+  console.log("dotenv not available, using environment variables from Heroku");
+}
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
