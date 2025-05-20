@@ -67,8 +67,8 @@ const PORT = process.env.PORT || 5000;
 app.use(
   cors({
     origin: process.env.NODE_ENV === "production" 
-      ? ["https://community-empowerment-hub-313ac18da07a.herokuapp.com", "https://community-empowerment-hub.herokuapp.com"] 
-      : "http://localhost:5173",
+      ? ["https://community-empowerment-hub-313ac18da07a.herokuapp.com"] 
+      : ["http://localhost:5173", "http://127.0.0.1:5173"],
     methods: ["GET", "POST", "DELETE", "PUT"],
     allowedHeaders: [
       "Content-Type",
@@ -82,8 +82,8 @@ app.use(
 );
 
 console.log("CORS Configuration:", process.env.NODE_ENV === "production" 
-  ? ["https://community-empowerment-hub-313ac18da07a.herokuapp.com", "https://community-empowerment-hub.herokuapp.com"] 
-  : "http://localhost:5173");
+  ? ["https://community-empowerment-hub-313ac18da07a.herokuapp.com"] 
+  : ["http://localhost:5173", "http://127.0.0.1:5173"]);
 
 app.use(cookieParser());
 app.use(express.json());

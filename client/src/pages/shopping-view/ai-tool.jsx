@@ -766,7 +766,7 @@ const handleDownloadReport = () => {
   // Extract growth percentage from the text using regex
   // Add null check to prevent TypeError
   const growthPotential = analysisResults?.summaryMetrics?.growthPotential || '';
-  const growthValue = typeof growthPotential === 'string' ? (growthPotential.match(/\d+/)?.[0] || "N/A") : "N/A";
+  const growthValue = typeof growthPotential === 'string' && growthPotential ? (growthPotential.match(/\d+/)?.[0] || "N/A") : "N/A";
   
   doc.setFontSize(12);
   doc.setFont('helvetica', 'normal');
