@@ -31,6 +31,7 @@ const userRouter = require('./routes/userRoutes');
 
 // Import configuration check routes
 const configRoutes = require('./routes/common/config-routes');
+const healthRoutes = require('./routes/common/health-routes');
 
 console.log("Connecting to MongoDB...");
 
@@ -114,6 +115,9 @@ app.use("/api/reviews", require("./routes/shop/review-routes"));
 
 // Configuration check route
 app.use("/api/system", configRoutes);
+
+// Health check routes
+app.use("/api/health", healthRoutes);
 
 // 404 Not Found middleware
 app.use((req, res, next) => {
