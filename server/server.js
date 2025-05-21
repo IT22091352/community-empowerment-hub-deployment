@@ -69,15 +69,23 @@ app.use(
     origin: function (origin, callback) {
       // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
-      
-      const allowedOrigins = process.env.NODE_ENV === "production"
+        const allowedOrigins = process.env.NODE_ENV === "production"
         ? [
             "https://community-empowerment-hub-313ac18da07a.herokuapp.com",
-            "https://community-empowerment-hub.herokuapp.com"
+            "https://community-empowerment-hub.herokuapp.com",
+            // Allow all Heroku domains for this app
+            /https:\/\/.*\.herokuapp\.com$/
           ]
         : ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174"];
-        
-      if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+          // Check if origin matches any of our allowed origins (including RegExp patterns)
+      const originAllowed = allowedOrigins.some(allowedOrigin => {
+        if (allowedOrigin instanceof RegExp) {
+          return allowedOrigin.test(origin);
+        }
+        return allowedOrigin === origin;
+      });
+      
+      if (originAllowed || !origin) {
         callback(null, true);
       } else {
         console.log("Blocked by CORS: ", origin);

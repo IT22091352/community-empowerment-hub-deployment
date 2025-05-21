@@ -34,32 +34,56 @@ const diagnostics = [
       
       return result;
     }
-  },
-  {
+  },  {
     name: 'Environment Check',
     run: async () => {
-      const isProd = window.location.hostname.includes('herokuapp.com') || 
-                    (typeof import.meta !== 'undefined' && import.meta.env?.PROD);
+      let isProd = false;
+      let hostname = 'unknown';
+      let windowEnvStatus = 'unknown';
+      
+      try {
+        // Use safe access for window properties
+        if (typeof window !== 'undefined') {
+          hostname = window.location?.hostname || 'unknown';
+          isProd = hostname.includes('herokuapp.com');
+          windowEnvStatus = window.ENV ? 'available' : 'not available';
+        }
+        
+        // Also check import.meta if available
+        if (typeof import.meta !== 'undefined' && import.meta.env?.PROD) {
+          isProd = true;
+        }
+      } catch (error) {
+        console.error('Error checking environment:', error);
+      }
       
       return { 
         success: true,
         environment: isProd ? 'production' : 'development',
-        hostname: window.location.hostname,
-        windowEnv: window.ENV ? 'available' : 'not available'
+        hostname: hostname,
+        windowEnv: windowEnvStatus
       };
     }
-  },
-  {
+  },  {
     name: 'API Connectivity Test',
     run: async () => {
       try {
-        // Test basic API connectivity
-        const connectionTest = await testAPIConnection();
-        return connectionTest;
+        // Test basic API connectivity with timeout
+        const connectionTest = await Promise.race([
+          testAPIConnection(),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('API connectivity test timed out after 5000ms')), 5000)
+          )
+        ]);
+        
+        return connectionTest || { 
+          success: false, 
+          error: 'No response from API connectivity test' 
+        };
       } catch (error) {
         return {
           success: false,
-          error: error.message
+          error: error.message || 'Unknown error in API connectivity test'
         };
       }
     }

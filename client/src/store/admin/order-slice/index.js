@@ -20,8 +20,9 @@ export const getAllOrdersForAdmin = createAsyncThunk(
 export const getOrderDetailsForAdmin = createAsyncThunk(
   "/order/getOrderDetailsForAdmin",
   async (id) => {
+    // Use relative API URL instead of hardcoded domain to work in any environment
     const response = await axios.get(
-      `https://community-empowerment-hub-313ac18da07a.herokuapp.com/api/admin/orders/details/${id}`
+      `/api/admin/orders/details/${id}`
     );
 
     return response.data;

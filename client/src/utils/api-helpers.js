@@ -104,35 +104,64 @@ export const createAuthenticatedAPI = (baseURL = API_URL) => {
 
 // Function to test API connectivity with multiple endpoints
 export const testAPIConnection = async () => {
-  const endpoints = [
-    { url: `${API_URL}/health/health`, name: 'Current API' },
-    { url: `${API_URL}/system/config-check`, name: 'System Config' }
-  ];
+  const endpoints = [];
   
-  // Also test the production endpoint if not already using it
-  if (API_URL !== PRODUCTION_API_URL) {
-    endpoints.push({ 
-      url: `${PRODUCTION_API_URL}/health/health`, 
-      name: 'Production API' 
-    });
+  // Safe access to API URLs
+  const apiUrl = API_URL || '/api';
+  const prodApiUrl = PRODUCTION_API_URL || 'https://community-empowerment-hub-313ac18da07a.herokuapp.com/api';
+  const localApiUrl = LOCAL_API_URL || '/api';
+  
+  try {
+    // Add current API endpoints with safety checks
+    endpoints.push(
+      { url: `${apiUrl}/health/health`, name: 'Current API' },
+      { url: `${apiUrl}/system/config-check`, name: 'System Config' }
+    );
+    
+    // Also test the production endpoint if not already using it and if it's defined
+    if (apiUrl !== prodApiUrl && prodApiUrl) {
+      endpoints.push({ 
+        url: `${prodApiUrl}/health/health`, 
+        name: 'Production API' 
+      });
+    }
+    
+    // Also test localhost if in development
+    if (typeof window !== 'undefined' && 
+        (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') &&
+        apiUrl !== localApiUrl && localApiUrl) {
+      endpoints.push({ 
+        url: `${localApiUrl}/health/health`, 
+        name: 'Local API' 
+      });
+    }
+  } catch (error) {
+    console.error('Error setting up API test endpoints:', error);
+    // Fallback to basic endpoint
+    endpoints.push({ url: '/api/health/health', name: 'Fallback API' });
   }
-  
-  // Also test localhost if in development
-  if (typeof window !== 'undefined' && 
-      (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') &&
-      API_URL !== LOCAL_API_URL) {
-    endpoints.push({ 
-      url: `${LOCAL_API_URL}/health/health`, 
-      name: 'Local API' 
-    });
-  }
-  
-  const results = {};
+    const results = {};
   let overallSuccess = false;
   
-  // Test each endpoint
+  if (endpoints.length === 0) {
+    return {
+      success: false,
+      error: 'No endpoints configured for testing',
+      results: {}
+    };
+  }
+  
+  // Test each endpoint with proper error handling
   for (const endpoint of endpoints) {
     try {
+      if (!endpoint.url) {
+        results[endpoint.name || 'Unknown'] = {
+          success: false,
+          error: 'Invalid endpoint URL'
+        };
+        continue;
+      }
+      
       const response = await axios.get(endpoint.url, { 
         timeout: 5000,
         validateStatus: status => status < 500 // Accept any non-server error response
@@ -148,11 +177,12 @@ export const testAPIConnection = async () => {
         overallSuccess = true;
       }
       
-      console.log(`API Test [${endpoint.name}]:`, response.status, response.data);
+      console.log(`API Test [${endpoint.name}]:`, response.status, 
+                 response.data ? 'Data received' : 'No data');
     } catch (error) {
       results[endpoint.name] = {
         success: false,
-        error: error.message
+        error: error?.message || 'Unknown error'
       };
       console.error(`API Test [${endpoint.name}] Failed:`, error);
     }

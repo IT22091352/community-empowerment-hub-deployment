@@ -7,12 +7,12 @@ let apiBaseUrl;
 // Try-catch to avoid errors when determining the API URL
 try {
   // Priority 1: Use window.ENV if available (from env-config.js)
-  if (typeof window !== 'undefined' && window.ENV?.API_URL) {
+  if (typeof window !== 'undefined' && window.ENV && window.ENV.API_URL) {
     apiBaseUrl = window.ENV.API_URL;
     console.log('Using API URL from window.ENV:', apiBaseUrl);
   } 
   // Priority 2: Use production URL directly for production environment
-  else if (process.env.NODE_ENV === 'production') {
+  else if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'production') {
     // In production, we can use relative URLs if the frontend and API are deployed together
     // or the full URL if they're on different domains
     apiBaseUrl = '/api';

@@ -10,7 +10,7 @@ export const ApiHealthIndicator = () => {
   const [healthStatus, setHealthStatus] = useState({
     checking: true,
     success: false,
-    apiUrl: API_URL,
+    apiUrl: API_URL || '/api', // Provide fallback
     error: null
   });
   const [isExpanded, setIsExpanded] = useState(false);
@@ -19,20 +19,27 @@ export const ApiHealthIndicator = () => {
   useEffect(() => {
     const checkApiHealth = async () => {
       try {
-        const result = await testAPIConnection();
+        // Add timeout to prevent hanging
+        const result = await Promise.race([
+          testAPIConnection(),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('API health check timed out')), 5000)
+          )
+        ]);
+        
         setHealthStatus({
           checking: false,
-          success: result.success,
-          apiUrl: API_URL,
-          results: result.results,
-          error: result.success ? null : 'API connection failed'
+          success: result?.success || false,
+          apiUrl: API_URL || '/api',
+          results: result?.results || [],
+          error: (result?.success === true) ? null : 'API connection failed'
         });
       } catch (error) {
         setHealthStatus({
           checking: false,
           success: false,
-          apiUrl: API_URL,
-          error: error.message
+          apiUrl: API_URL || '/api',
+          error: error?.message || 'Unknown error checking API health'
         });
       }
     };
