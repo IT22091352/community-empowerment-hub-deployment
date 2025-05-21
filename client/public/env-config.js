@@ -15,7 +15,7 @@
     apiUrl = `${currentDomain}/api`;
   } else {
     // Local development - use localhost:5000
-    apiUrl = 'http://localhost:5000/api';
+    apiUrl = 'https://community-empowerment-hub-313ac18da07a.herokuapp.com/api';
   }
   
   // Make environment configuration available globally
@@ -23,7 +23,7 @@
     // API URLs for different environments
     API_URL: apiUrl,
     PRODUCTION_API_URL: `${PRODUCTION_DOMAIN}/api`,
-    LOCAL_API_URL: 'http://localhost:5000/api',
+    LOCAL_API_URL: 'https://community-empowerment-hub-313ac18da07a.herokuapp.com/api',
     
     // Domain information
     APP_DOMAIN: window.location.hostname,
