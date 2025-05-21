@@ -759,23 +759,21 @@ const handleDownloadReport = () => {
   doc.roundedRect(margin, 160, contentWidth, 70, 3, 3, 'F');
   
   doc.setFontSize(14);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...colors.primary);
+  doc.setFont('helvetica', 'bold');  doc.setTextColor(...colors.primary);
   doc.text('EXECUTIVE SUMMARY', pageWidth / 2, 172, { align: 'center' });
   
-  // Extract growth percentage from the text using regex
-  const growthValue = analysisResults.summaryMetrics.growthPotential.match(/\d+/)?.[0] || "N/A";
+  // Extract growth percentage from the text using regex with safety check
+  const growthValue = analysisResults.summaryMetrics.growthPotential && analysisResults.summaryMetrics.growthPotential.match(/\d+/)?.[0] || "N/A";
   
   doc.setFontSize(12);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(...colors.text);
-  
-  // Add key metrics in an organized manner
+    // Add key metrics in an organized manner
   const metrics = [
     { key: 'Growth Potential', value: `${growthValue}% revenue increase over 6 months` },
-    { key: 'Primary Challenge', value: analysisResults.summaryMetrics.primaryChallenge },
-    { key: 'Recommendation', value: analysisResults.summaryMetrics.topRecommendation },
-    { key: 'Market Position', value: analysisResults.summaryMetrics.marketPosition }
+    { key: 'Primary Challenge', value: analysisResults.summaryMetrics?.primaryChallenge || 'N/A' },
+    { key: 'Recommendation', value: analysisResults.summaryMetrics?.topRecommendation || 'N/A' },
+    { key: 'Market Position', value: analysisResults.summaryMetrics?.marketPosition || 'N/A' }
   ];
   
   let metricY = 180;
@@ -804,15 +802,14 @@ const handleDownloadReport = () => {
   let yPos = addPageWithHeader('MARKET TRENDS & COMPETITIVE LANDSCAPE');
   
   // Add market overview section
-  yPos = addSectionTitle('Market Overview', yPos);
-  yPos = addParagraph(analysisResults.marketTrends.overall, yPos + 5);
-  yPos = addParagraph(analysisResults.marketTrends.competitiveLandscape, yPos + 5);
+  yPos = addSectionTitle('Market Overview', yPos);  yPos = addParagraph(analysisResults.marketTrends?.overall || 'No market trend data available.', yPos + 5);
+  yPos = addParagraph(analysisResults.marketTrends?.competitiveLandscape || 'No competitive landscape data available.', yPos + 5);
   
   // Add seasonal trends table
   yPos = addSectionTitle('Seasonal Demand Trends', yPos + 5);
   
   // Create season trends table
-  const seasonalTrends = analysisResults.marketTrends.seasonal;
+  const seasonalTrends = analysisResults.marketTrends?.seasonal || [];
   const seasonHeaders = [['Month', 'Demand Level', 'Value', 'Key Driver']];
   const seasonRows = seasonalTrends.map(item => [
     item.month,
@@ -859,7 +856,7 @@ const handleDownloadReport = () => {
   yPos = addSectionTitle('Competitive Landscape', yPos);
   
   // Create competitor analysis table
-  const competitors = analysisResults.marketTrends.competitorAnalysis;
+  const competitors = analysisResults.marketTrends?.competitorAnalysis || [];
   const compHeaders = [['Competitor', 'Market Share', 'Price Point', 'Quality Level']];
   const compRows = competitors.map(comp => [
     comp.name,
@@ -896,10 +893,10 @@ const handleDownloadReport = () => {
   yPos = addSectionTitle('Revenue Forecast', yPos);
   
   // Get revenue data
-  const revenueData = analysisResults.financialProjections.revenueData;
-  const currentRevenue = revenueData[0].amount;
-  const projectedRevenue = revenueData[revenueData.length - 1].amount;
-  const growthPercent = ((projectedRevenue - currentRevenue) / currentRevenue * 100).toFixed(1);
+  const revenueData = analysisResults.financialProjections?.revenueData || [];
+  const currentRevenue = revenueData.length > 0 ? revenueData[0].amount : 0;
+  const projectedRevenue = revenueData.length > 0 ? revenueData[revenueData.length - 1].amount : 0;
+  const growthPercent = currentRevenue > 0 ? ((projectedRevenue - currentRevenue) / currentRevenue * 100).toFixed(1) : "0.0";
   
   // Add revenue growth summary
   yPos = addParagraph(`Projected revenue growth over next 6 months: ${growthPercent}%`, yPos + 5);
@@ -940,12 +937,11 @@ const handleDownloadReport = () => {
   
   // Add profit margin section
   yPos = addSectionTitle('Profit Margin Analysis', yPos);
-  
-  const profitMargin = analysisResults.financialProjections.profitMargin;
+    const profitMargin = analysisResults.financialProjections?.profitMargin || { current: 0, projected: 0, industry: 0 };
   const profitMarginData = [
-    profitMargin.current,
-    profitMargin.projected,
-    profitMargin.industry
+    profitMargin.current || 0,
+    profitMargin.projected || 0,
+    profitMargin.industry || 0
   ];
   
   const profitLabels = [
@@ -960,14 +956,17 @@ const handleDownloadReport = () => {
   
   // Add break-even analysis
   yPos = addSectionTitle('Break-Even Analysis', yPos);
-  
-  const breakEven = analysisResults.financialProjections.breakEvenAnalysis;
+    const breakEven = analysisResults.financialProjections?.breakEvenAnalysis || {
+    fixedCosts: 0,
+    variableCostsPerUnit: 0,
+    breakEvenUnits: 0
+  };
   
   // Create break-even table
   const breakEvenData = [
-    ['Fixed Monthly Costs', `LKR ${breakEven.fixedCosts.toLocaleString('en-US')}`],
-    ['Variable Cost per Unit', `LKR ${breakEven.variableCostsPerUnit.toLocaleString('en-US')}`],
-    ['Break-Even Units', `${breakEven.breakEvenUnits.toLocaleString('en-US')} units`]
+    ['Fixed Monthly Costs', `LKR ${(breakEven.fixedCosts || 0).toLocaleString('en-US')}`],
+    ['Variable Cost per Unit', `LKR ${(breakEven.variableCostsPerUnit || 0).toLocaleString('en-US')}`],
+    ['Break-Even Units', `${(breakEven.breakEvenUnits || 0).toLocaleString('en-US')} units`]
   ];
   
   doc.autoTable({
@@ -1169,8 +1168,7 @@ const handleDownloadReport = () => {
   yPos = addSectionTitle('Key Risks & Mitigation Strategies', yPos);
   
   // Create risks table
-  const risksHeaders = [['Risk Description', 'Severity', 'Mitigation Strategy']];
-  const risksRows = analysisResults.risks.map(risk => [
+  const risksHeaders = [['Risk Description', 'Severity', 'Mitigation Strategy']];  const risksRows = (analysisResults.risks || []).map(risk => [
     risk.description,
     risk.severity,
     risk.mitigation
@@ -1212,8 +1210,7 @@ const handleDownloadReport = () => {
   // Render chart for seasonal trends with improved spacing and local context
   const renderSeasonalTrendChart = () => {
     if (!analysisResults) return null;
-    
-    const trends = analysisResults.marketTrends.seasonal;
+      const trends = analysisResults.marketTrends?.seasonal || [];
     const peakMonths = trends
       .filter(month => month.value > 110)
       .map(month => month.month)
@@ -1318,8 +1315,7 @@ const handleDownloadReport = () => {
   // Render competitor pricing chart with improved visual readability
 const renderCompetitorPricingChart = () => {
   if (!analysisResults) return null;
-  
-  const pricingData = analysisResults.pricingStrategy.competitivePricing;
+    const pricingData = analysisResults.pricingStrategy?.competitivePricing || [];
   const currentPrice = pricingData.find(item => item.competitor === 'Your Current')?.price || 0;
   const recommendedPrice = pricingData.find(item => item.competitor === 'Recommended')?.price || 0;
   const percentChange = ((recommendedPrice - currentPrice) / currentPrice * 100).toFixed(1);
@@ -1438,11 +1434,11 @@ const renderCompetitorPricingChart = () => {
 const renderFinancialProjections = () => {
   if (!analysisResults) return null;
   
-  const revenueData = analysisResults.financialProjections.revenueData;
-  const profitMargin = analysisResults.financialProjections.profitMargin;
-  const currentRevenue = revenueData[0].amount;
-  const projectedRevenue = revenueData[revenueData.length - 1].amount;
-  const growthPercent = ((projectedRevenue - currentRevenue) / currentRevenue * 100).toFixed(1);
+  const revenueData = analysisResults.financialProjections?.revenueData || [];
+  const profitMargin = analysisResults.financialProjections?.profitMargin || { current: 0, projected: 0, industry: 0 };
+  const currentRevenue = revenueData.length > 0 ? revenueData[0].amount : 0;
+  const projectedRevenue = revenueData.length > 0 ? revenueData[revenueData.length - 1].amount : 0;
+  const growthPercent = currentRevenue > 0 ? ((projectedRevenue - currentRevenue) / currentRevenue * 100).toFixed(1) : "0.0";
   const isPositiveGrowth = parseFloat(growthPercent) >= 0;
   
   // FIX: Add explanation message if growth projection is negative despite "Increase Revenue" goal
@@ -1946,14 +1942,13 @@ const renderFinancialProjections = () => {
                     </svg>
                   </div>
                   <div>
-                    <h4 className="font-bold text-lg text-gray-800">{t('Growth Potential')}</h4>
-                    <p className="text-xl font-semibold text-green-600">
-                      {/* Extract just the number from the growth potential text using regex */}
-                      {analysisResults.summaryMetrics.growthPotential.match(/\d+/)?.[0] || "N/A"}
+                    <h4 className="font-bold text-lg text-gray-800">{t('Growth Potential')}</h4>                    <p className="text-xl font-semibold text-green-600">
+                      {/* Extract just the number from the growth potential text using regex with safety check */}
+                      {analysisResults.summaryMetrics.growthPotential && analysisResults.summaryMetrics.growthPotential.match(/\d+/)?.[0] || "N/A"}
                       <span className="text-green-600 font-bold">%</span>
                       <span className="text-sm font-normal text-gray-600 ml-2">{t('revenue increase over 6 months')}</span>
                       <span className="text-xs ml-1 text-gray-500">
-                        ({analysisResults.summaryMetrics.growthPotential.match(/\(\d+-\d+\%\)/)?.[0]?.replace(/[()]/g, '') || ""})
+                        ({analysisResults.summaryMetrics.growthPotential && analysisResults.summaryMetrics.growthPotential.match(/\(\d+-\d+\%\)/)?.[0]?.replace(/[()]/g, '') || ""})
                       </span>
                     </p>
                     <p className="text-xs mt-1 text-gray-500 italic">
@@ -1976,7 +1971,7 @@ const renderFinancialProjections = () => {
                       </div>
                       <h4 className="font-medium text-gray-800">{t('Primary Challenge')}</h4>
                     </div>
-                    <p className="text-sm text-gray-700 pl-9">{analysisResults.summaryMetrics.primaryChallenge}</p>
+                    <p className="text-sm text-gray-700 pl-9">{analysisResults.summaryMetrics?.primaryChallenge || 'N/A'}</p>
                   </div>
                 </div>
                 
@@ -1991,7 +1986,7 @@ const renderFinancialProjections = () => {
                       </div>
                       <h4 className="font-medium text-gray-800">{t('Top Recommendation')}</h4>
                     </div>
-                    <p className="text-sm text-gray-700 pl-9">{analysisResults.summaryMetrics.topRecommendation}</p>
+                    <p className="text-sm text-gray-700 pl-9">{analysisResults.summaryMetrics?.topRecommendation || 'N/A'}</p>
                   </div>
                 </div>
                 
@@ -2006,7 +2001,7 @@ const renderFinancialProjections = () => {
                       </div>
                       <h4 className="font-medium text-gray-800">{t('Market Position')}</h4>
                     </div>
-                    <p className="text-sm text-gray-700 pl-9">{analysisResults.summaryMetrics.marketPosition}</p>
+                    <p className="text-sm text-gray-700 pl-9">{analysisResults.summaryMetrics?.marketPosition || 'N/A'}</p>
                   </div>
                 </div>
               </div>
@@ -2033,7 +2028,7 @@ const renderFinancialProjections = () => {
               
               <div className="bg-blue-50 p-3 rounded-md mb-4">
                 <p className="text-sm text-blue-800">
-                  <span className="font-semibold">{t('Market Overview')}:</span> {analysisResults.marketTrends.overall}
+                  <span className="font-semibold">{t('Market Overview')}:</span> {analysisResults.marketTrends?.overall || 'No market trend data available.'}
                 </p>
               </div>
               
@@ -2077,8 +2072,7 @@ const renderFinancialProjections = () => {
               {analysisResults.pricingStrategy.bundleOpportunities && (
                 <div className="bg-white p-5 rounded-lg shadow-sm mt-6">
                   <h4 className="text-lg font-medium mb-2">{t('Bundling Recommendations')}</h4>
-                  <ul className="list-disc pl-5 space-y-2">
-                    {analysisResults.pricingStrategy.bundleOpportunities.map((item, index) => (
+                  <ul className="list-disc pl-5 space-y-2">                    {(analysisResults.pricingStrategy.bundleOpportunities || []).map((item, index) => (
                       <li key={index} className="text-gray-700">{item}</li>
                     ))}
                   </ul>
