@@ -763,19 +763,19 @@ const handleDownloadReport = () => {
   doc.setTextColor(...colors.primary);
   doc.text('EXECUTIVE SUMMARY', pageWidth / 2, 172, { align: 'center' });
   
-  // Add null/undefined checks to prevent TypeError
-  const growthPotential = analysisResults?.summaryMetrics?.growthPotential || '';
-  const growthValue = typeof growthPotential === 'string' && growthPotential ? (growthPotential.match(/\d+/)?.[0] || "N/A") : "N/A";
+  // Extract growth percentage from the text using regex
+  const growthValue = analysisResults.summaryMetrics.growthPotential.match(/\d+/)?.[0] || "N/A";
   
   doc.setFontSize(12);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(...colors.text);
-    // Add key metrics in an organized manner
+  
+  // Add key metrics in an organized manner
   const metrics = [
     { key: 'Growth Potential', value: `${growthValue}% revenue increase over 6 months` },
-    { key: 'Primary Challenge', value: analysisResults?.summaryMetrics?.primaryChallenge || 'Not available' },
-    { key: 'Recommendation', value: analysisResults?.summaryMetrics?.topRecommendation || 'Not available' },
-    { key: 'Market Position', value: analysisResults?.summaryMetrics?.marketPosition || 'Not available' }
+    { key: 'Primary Challenge', value: analysisResults.summaryMetrics.primaryChallenge },
+    { key: 'Recommendation', value: analysisResults.summaryMetrics.topRecommendation },
+    { key: 'Market Position', value: analysisResults.summaryMetrics.marketPosition }
   ];
   
   let metricY = 180;
@@ -1572,8 +1572,9 @@ const renderFinancialProjections = () => {
           </p>
         </div>
       </div>
-    );
-  };
+    </div>
+  );
+};
 
   // Render growth opportunities section
   const renderGrowthOpportunities = () => {
@@ -1583,7 +1584,7 @@ const renderFinancialProjections = () => {
     
     return (
       <div className="bg-white p-5 rounded-lg shadow-sm mt-6">
-        <h4 className="text-lg font-medium mb-2">{t('Growth Opportunities')}</h4>
+        <h4 className="text-lg font-medium mb-3">{t('Growth Opportunities')}</h4>
         
         {opportunities.platforms && opportunities.platforms.length > 0 && (
           <div className="mb-4">
@@ -1627,14 +1628,13 @@ const renderFinancialProjections = () => {
     
     return (
       <div className="bg-white p-5 rounded-lg shadow-sm mt-6">
-        <h4 className="text-lg font-medium mb-2">{t('Action Plan')}</h4>
+        <h4 className="text-lg font-medium mb-3">{t('Action Plan')}</h4>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white p-4 rounded-lg shadow-sm">
             <h4 className="flex items-center font-medium text-blue-900 mb-3">
               <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path fillRule="evenodd" d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0v-8z" clipRule="evenodd"></path>
-                <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd"></path>
               </svg>
               {t('Immediate Actions (Next 30 Days)')}
             </h4>
@@ -1648,8 +1648,7 @@ const renderFinancialProjections = () => {
           <div className="bg-white p-4 rounded-lg shadow-sm">
             <h4 className="flex items-center font-medium text-blue-900 mb-3">
               <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path fillRule="evenodd" d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0v-8z" clipRule="evenodd"></path>
-                <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd"></path>
               </svg>
               {t('Short-Term Actions (1-3 Months)')}
             </h4>
@@ -1663,8 +1662,7 @@ const renderFinancialProjections = () => {
           <div className="bg-white p-4 rounded-lg shadow-sm">
             <h4 className="flex items-center font-medium text-blue-900 mb-3">
               <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path fillRule="evenodd" d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0v-8z" clipRule="evenodd"></path>
-                <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd"></path>
               </svg>
               {t('Long-Term Strategy (3-6 Months)')}
             </h4>
@@ -1943,17 +1941,19 @@ const renderFinancialProjections = () => {
                 <div className="flex items-center">
                   <div className="bg-green-100 rounded-full p-3 mr-4">
                     <svg className="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0v-8z"></path>
+                      <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
                       <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
                     </svg>
                   </div>
                   <div>
-                    <h4 className="font-bold text-lg text-gray-800">{t('Growth Potential')}</h4>                    <p className="text-xl font-semibold text-green-600">
+                    <h4 className="font-bold text-lg text-gray-800">{t('Growth Potential')}</h4>
+                    <p className="text-xl font-semibold text-green-600">
                       {/* Extract just the number from the growth potential text using regex */}
-                      {(typeof analysisResults?.summaryMetrics?.growthPotential === 'string' && analysisResults?.summaryMetrics?.growthPotential) ? analysisResults.summaryMetrics.growthPotential.match(/\d+/)?.[0] || "N/A" : "N/A"}
+                      {analysisResults.summaryMetrics.growthPotential.match(/\d+/)?.[0] || "N/A"}
                       <span className="text-green-600 font-bold">%</span>
+                      <span className="text-sm font-normal text-gray-600 ml-2">{t('revenue increase over 6 months')}</span>
                       <span className="text-xs ml-1 text-gray-500">
-                        {(typeof analysisResults?.summaryMetrics?.growthPotential === 'string' && analysisResults?.summaryMetrics?.growthPotential) ? analysisResults.summaryMetrics.growthPotential.match(/\(\d+-\d+\%\)/)?.[0]?.replace(/[()]/g, '') || "" : ""}
+                        ({analysisResults.summaryMetrics.growthPotential.match(/\(\d+-\d+\%\)/)?.[0]?.replace(/[()]/g, '') || ""})
                       </span>
                     </p>
                     <p className="text-xs mt-1 text-gray-500 italic">
@@ -1971,8 +1971,7 @@ const renderFinancialProjections = () => {
                     <div className="flex items-center mb-2">
                       <div className="bg-amber-100 rounded-full p-2 mr-2">
                         <svg className="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0v-8z" clipRule="evenodd"></path>
-                          <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+                          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd"></path>
                         </svg>
                       </div>
                       <h4 className="font-medium text-gray-800">{t('Primary Challenge')}</h4>
@@ -1987,7 +1986,7 @@ const renderFinancialProjections = () => {
                     <div className="flex items-center mb-2">
                       <div className="bg-blue-100 rounded-full p-2 mr-2">
                         <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4zM11 13a1 1 0 11-2 0 1 1 0 012 0z" />
+                          <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z"></path>
                         </svg>
                       </div>
                       <h4 className="font-medium text-gray-800">{t('Top Recommendation')}</h4>
