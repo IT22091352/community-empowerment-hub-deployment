@@ -6,33 +6,69 @@ const { check, validationResult } = require("express-validator");
 //register
 const registerUser = async (req, res) => {
   const { userName, email, password, role} = req.body;
-
   try {
+    console.log("Registration attempt for:", email);
+    
+    // Validate required fields
+    if (!userName || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields: username, email and password are required",
+      });
+    }
+    
+    // Check if user already exists
     const checkUser = await User.findOne({ email });
-    if (checkUser)
+    if (checkUser) {
+      console.log("Registration failed: Email already exists:", email);
       return res.json({
         success: false,
         message: "User Already exists with the same email! Please try again",
       });
+    }
 
+    // Hash the password
     const hashPassword = await bcrypt.hash(password, 12);
+    
+    // Create new user with validated role
+    const validRole = ['seller', 'buyer', 'admin'].includes(role) ? role : 'buyer';
+    
     const newUser = new User({
       userName,
       email,
       password: hashPassword,
-      role,
+      role: validRole,
     });
 
+    // Save the user
     await newUser.save();
+    console.log("User registration successful:", email);
+    
     res.status(200).json({
       success: true,
       message: "Registration successful",
     });
   } catch (e) {
-    console.log(e);
+    console.error("Registration error:", e);
+    console.error("Error stack:", e.stack);
+    
+    // More detailed error messages for different types of errors
+    let errorMessage = "Internal server error occurred";
+    
+    if (e.name === 'ValidationError') {
+      errorMessage = "Validation error: " + Object.values(e.errors).map(err => err.message).join(', ');
+    } else if (e.code === 11000) {
+      errorMessage = "Duplicate key error: A user with that information already exists";
+    } else if (e.name === 'MongoServerError') {
+      errorMessage = "Database error: " + e.message;
+    } else if (e.name === 'MongooseError') {
+      errorMessage = "Mongoose error: " + e.message;
+    }
+    
     res.status(500).json({
       success: false,
-      message: "Some error occured",
+      message: errorMessage,
+      error: process.env.NODE_ENV === 'production' ? undefined : e.message
     });
   }
 };

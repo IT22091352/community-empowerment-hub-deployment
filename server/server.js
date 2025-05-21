@@ -36,16 +36,46 @@ const healthRoutes = require('./routes/common/health-routes');
 
 console.log("Connecting to MongoDB...");
 
-// Connect to MongoDB
-dbConnect()
-  .then(() => console.log("MongoDB connected successfully"))
-  .catch((error) => {
-    console.error("MongoDB connection error:", error);
-    // Log more details about the error for debugging
-    if (error.name === 'MongoServerSelectionError') {
-      console.error("MongoDB connection timeout. Check network or credentials.");
-    }
-  });
+// Connect to MongoDB with improved error handling and retry logic
+let retryCount = 0;
+const MAX_RETRIES = 3;
+
+const connectWithRetry = () => {
+  console.log(`MongoDB connection attempt ${retryCount + 1}/${MAX_RETRIES + 1}...`);
+  
+  dbConnect()
+    .then(() => {
+      console.log("✅ MongoDB connected successfully");
+      // Connection successful - no need to retry
+    })
+    .catch((error) => {
+      console.error(`❌ MongoDB connection error (attempt ${retryCount + 1}):`, error.message);
+      
+      // Enhanced error logging by error type
+      if (error.name === 'MongoServerSelectionError') {
+        console.error("- Could not select a MongoDB server. Check network connectivity and MongoDB status.");
+      } else if (error.name === 'MongoNetworkError') {
+        console.error("- Network error connecting to MongoDB. Check VPN, firewall, or network settings.");
+      } else if (error.name === 'MongooseServerSelectionError') {
+        console.error("- Server selection timed out. The MongoDB server may be down or unreachable.");
+      } else if (error.name === 'MongoParseError') {
+        console.error("- Invalid MongoDB connection string. Please check the format.");
+      }
+      
+      // Retry logic for transient errors
+      retryCount++;
+      if (retryCount < MAX_RETRIES) {
+        console.log(`Retrying connection in ${retryCount * 2} seconds...`);
+        setTimeout(connectWithRetry, retryCount * 2000); // Exponential backoff
+      } else {
+        console.error("Maximum retry attempts reached. Server will continue but database operations will fail.");
+        console.error("Please check database configuration and connectivity.");
+      }
+    });
+};
+
+// Start the connection process
+connectWithRetry();
 
 // Log environment details for debugging
 console.log("Node Environment:", process.env.NODE_ENV);

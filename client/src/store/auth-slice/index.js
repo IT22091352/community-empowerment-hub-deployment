@@ -10,16 +10,37 @@ const initialState = {
 export const registerUser = createAsyncThunk(
   "/auth/register",
 
-  async (formData) => {
-    const response = await axios.post(
-      "/api/auth/register",
-      formData,
-      {
-        withCredentials: true,
+  async (formData, { rejectWithValue }) => {
+    try {
+      console.log("Attempting to register user...");
+      // Use the API_URL from config for consistency
+      const response = await axios.post(
+        "/api/auth/register",
+        formData,
+        {
+          withCredentials: true,
+          timeout: 10000, // 10 second timeout
+        }
+      );
+      console.log("Registration successful:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Registration error:", error);
+      if (error.response) {
+        // The server responded with a status code outside the 2xx range
+        console.error("Server error data:", error.response.data);
+        console.error("Server error status:", error.response.status);
+        return rejectWithValue(error.response.data || "Registration failed");
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error("No response received from server");
+        return rejectWithValue("No response from server. Please check your connection.");
+      } else {
+        // Something happened in setting up the request
+        console.error("Error setting up request:", error.message);
+        return rejectWithValue("Request failed: " + error.message);
       }
-    );
-
-    return response.data;
+    }
   }
 );
 
