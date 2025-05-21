@@ -47,16 +47,41 @@ export const registerUser = createAsyncThunk(
 export const loginUser = createAsyncThunk(
   "/auth/login",
 
-  async (formData) => {
-    const response = await axios.post(
-      "/api/auth/login",
-      formData,
-      {
-        withCredentials: true,
+  async (formData, { rejectWithValue }) => {
+    try {      console.log("Attempting to login user...");
+      // Add more detailed logging about the URL construction
+      const loginEndpoint = "/api/auth/login";
+      console.log(`Login endpoint: ${loginEndpoint}`);
+      console.log(`axios.defaults.baseURL: "${axios.defaults.baseURL}"`);
+      console.log(`Full URL will be: ${axios.defaults.baseURL ? axios.defaults.baseURL : ''}${loginEndpoint}`);
+      
+      const response = await axios.post(
+        loginEndpoint,
+        formData,
+        {
+          withCredentials: true,
+          timeout: 10000, // 10 second timeout
+        }
+      );
+      console.log("Login successful:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Login error:", error);
+      if (error.response) {
+        // The server responded with a status code outside the 2xx range
+        console.error("Server error data:", error.response.data);
+        console.error("Server error status:", error.response.status);
+        return rejectWithValue(error.response.data || "Login failed");
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error("No response received from server");
+        return rejectWithValue("No response from server. Please check your connection.");
+      } else {
+        // Something happened in setting up the request
+        console.error("Error setting up request:", error.message);
+        return rejectWithValue("Request failed: " + error.message);
       }
-    );
-
-    return response.data;
+    }
   }
 );
 

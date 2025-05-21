@@ -29,8 +29,9 @@ try {
   apiBaseUrl = '/api'; // Fallback to relative URL
 }
 
-// Export the base URL for API calls
-export const API_URL = apiBaseUrl;
+// Export the base URL for API calls - this should be an empty string if we're using relative '/api' path
+// to prevent the double '/api/api/' issue
+export const API_URL = apiBaseUrl === '/api' ? '' : apiBaseUrl;
 
 // Support for both local and production URLs
 export const LOCAL_API_URL = DEV_API_URL;
