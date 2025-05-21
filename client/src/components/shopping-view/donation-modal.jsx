@@ -24,7 +24,22 @@ import {
 } from "@stripe/react-stripe-js";
 
 // Initialize Stripe with your publishable key
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+// Added multiple fallbacks to prevent "Cannot read properties of undefined (reading 'match')" error
+const getStripeKey = () => {
+  // Priority 1: Use Vite env variable
+  if (import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY) {
+    return import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+  }
+  // Priority 2: Use window.ENV
+  if (typeof window !== 'undefined' && window.ENV && window.ENV.STRIPE_PUBLISHABLE_KEY) {
+    return window.ENV.STRIPE_PUBLISHABLE_KEY;
+  }
+  // Priority 3: Return placeholder that won't cause match() to fail
+  return 'pk_test_placeholder';
+};
+
+const stripePublishableKey = getStripeKey();
+const stripePromise = loadStripe(stripePublishableKey);
 
 // Donation form component (inside Stripe Elements)
 const DonationForm = ({ seller, onClose }) => {

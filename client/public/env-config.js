@@ -16,8 +16,7 @@
     // Local development - use relative URL with Vite proxy
     apiUrl = '/api';
   }
-  
-  // Make environment configuration available globally
+    // Make environment configuration available globally
   window.ENV = {    // API URLs for different environments
     API_URL: apiUrl,
     PRODUCTION_API_URL: `${PRODUCTION_DOMAIN}/api`,
@@ -32,7 +31,10 @@
     IS_DEVELOPMENT: isLocalhost,
     
     // App version
-    VERSION: '1.0.0'
+    VERSION: '1.0.0',
+    
+    // Stripe configuration
+    STRIPE_PUBLISHABLE_KEY: (isHeroku || !isLocalhost) ? 'pk_live_yourLiveKeyHere' : 'pk_test_yourTestKeyHere'
   };
   
   // Log the configuration for debugging
