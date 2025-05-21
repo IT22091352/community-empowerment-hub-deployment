@@ -16,6 +16,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { HeartHandshake, AlertCircle } from "lucide-react";
 import axios from "axios";
 import { loadStripe } from "@stripe/stripe-js";
+import { API_URL } from "@/config/apiConfig";
 import {
   Elements,
   CardElement,
@@ -80,10 +81,9 @@ const DonationForm = ({ seller, onClose }) => {
     
     setIsProcessing(true);
     
-    try {
-      // Step 1: Create a payment intent on the server
+    try {      // Step 1: Create a payment intent on the server
       const { data: intentData } = await axios.post(
-        "http://localhost:5000/api/shop/donations/create-intent",
+        `${API_URL}/shop/donations/create-intent`,
         {
           sellerId: seller.id,
           buyerId: user.id,
@@ -112,9 +112,8 @@ const DonationForm = ({ seller, onClose }) => {
         throw new Error(error.message);
       }
       
-      if (paymentIntent.status === "succeeded") {
-        // Step 3: Record the donation in our database
-        await axios.post("http://localhost:5000/api/shop/donations/process", {
+      if (paymentIntent.status === "succeeded") {        // Step 3: Record the donation in our database
+        await axios.post(`${API_URL}/shop/donations/process`, {
           paymentIntentId: intentData.paymentIntentId,
           sellerId: seller.id,
           buyerId: user.id,

@@ -23,6 +23,7 @@ const shopSearchRouter = require("./routes/shop/search-routes");
 const shopReviewRouter = require("./routes/shop/review-routes");
 const commonFeatureRouter = require("./routes/common/feature-routes");
 const shopPortfolioRouter = require("./routes/shop/portfolio-routes");
+const shopDonationRouter = require("./routes/shop/donation-routes");
 
 // Import job portal routes
 const jobRoutes = require('./routes/jobRoutes');
@@ -140,6 +141,7 @@ app.use("/api/shop/search", shopSearchRouter);
 app.use("/api/shop/review", shopReviewRouter);
 app.use("/api/common/feature", commonFeatureRouter);
 app.use("/api/shop/portfolio", shopPortfolioRouter);
+app.use("/api/shop/donations", shopDonationRouter);
 
 // Apply job portal routes
 app.use('/api/jobs', jobRoutes);
