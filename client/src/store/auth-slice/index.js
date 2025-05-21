@@ -46,14 +46,21 @@ export const registerUser = createAsyncThunk(
 
 export const loginUser = createAsyncThunk(
   "/auth/login",
-
   async (formData, { rejectWithValue }) => {
-    try {      console.log("Attempting to login user...");
+    try {
+      console.log("Attempting to login user...");
+      
       // Add more detailed logging about the URL construction
       const loginEndpoint = "/api/auth/login";
       console.log(`Login endpoint: ${loginEndpoint}`);
       console.log(`axios.defaults.baseURL: "${axios.defaults.baseURL}"`);
-      console.log(`Full URL will be: ${axios.defaults.baseURL ? axios.defaults.baseURL : ''}${loginEndpoint}`);
+      console.log(`Full URL will be: ${axios.defaults.baseURL}${loginEndpoint}`);
+      
+      // If we're on Heroku/production, log the full domain we're on
+      if (typeof window !== 'undefined') {
+        console.log(`Current origin: ${window.location.origin}`);
+        console.log(`Environment check: ${window.location.hostname.includes('herokuapp.com') ? 'Running on Heroku' : 'Not running on Heroku'}`);
+      }
       
       const response = await axios.post(
         loginEndpoint,

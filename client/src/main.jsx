@@ -54,16 +54,22 @@ const debugApiEndpoint = (path) => {
 
 // Configure axios globally
 try {
-  // Set axios defaults for consistent API calls
-  // Don't set baseURL if API_URL already includes '/api' to avoid path duplication
-  axios.defaults.baseURL = API_URL;
+  // Explicitly set baseURL to empty string to avoid path duplication with /api
+  // This ensures that when we use '/api/auth/login', it doesn't become '/api/api/auth/login'
+  axios.defaults.baseURL = '';
   axios.defaults.withCredentials = true;
   axios.defaults.timeout = 20000; // 20 seconds timeout
-  
-  // Enable better error logging in development
+    // Enable better error logging in development
   if (typeof process === 'undefined' || !process.env || process.env.NODE_ENV !== 'production') {
     axios.interceptors.request.use(request => {
+      // Check for duplicate /api prefix and fix it
+      if (request.url?.startsWith('/api') && request.baseURL?.endsWith('/api')) {
+        console.warn('Detected duplicate /api prefix, fixing request URL');
+        request.url = request.url.replace(/^\/api/, '');
+      }
+      
       console.log('Starting API request:', request.method?.toUpperCase(), request.url);
+      console.log('Full request URL:', request.baseURL + request.url);
       return request;
     });
     
@@ -78,11 +84,20 @@ try {
           error.config?.url,
           error.response?.data || error.message
         );
+        
+        // If we're getting a 404 with duplicate /api prefix, log helpful info
+        if (error.response?.status === 404 && 
+            error.response?.data?.error?.includes('/api/api/')) {
+          console.error('Detected duplicate /api prefix in URL. This is likely a configuration issue.');
+          console.error('Current axios baseURL:', axios.defaults.baseURL);
+          console.error('Request URL:', error.config?.url);
+        }
+        
         return Promise.reject(error);
       }
     );
   }
-    console.log('Axios configured with baseURL:', axios.defaults.baseURL || '(using relative URLs)');
+  console.log('Axios configured with baseURL:', axios.defaults.baseURL || '(using relative URLs)');
   
   // Add the debugApiEndpoint function to window for troubleshooting
   if (typeof window !== 'undefined') {
@@ -93,41 +108,6 @@ try {
     };
     console.log('API configuration helpers attached to window object for troubleshooting');
   }
-} catch (error) {
-  console.error('Error configuring axios:', error);
-}
-
-// Configure axios globally
-try {
-  // Set axios defaults for consistent API calls
-  axios.defaults.baseURL = API_URL;
-  axios.defaults.withCredentials = true;
-  axios.defaults.timeout = 20000; // 20 seconds timeout
-  
-  // Enable better error logging in development
-  if (typeof process === 'undefined' || !process.env || process.env.NODE_ENV !== 'production') {
-    axios.interceptors.request.use(request => {
-      console.log('Starting API request:', request.method?.toUpperCase(), request.url);
-      return request;
-    });
-    
-    axios.interceptors.response.use(
-      response => {
-        console.log('API response received:', response.status, response.config.url);
-        return response;
-      },
-      error => {
-        console.error('API error response:', 
-          error.response?.status || 'Network Error',
-          error.config?.url,
-          error.response?.data || error.message
-        );
-        return Promise.reject(error);
-      }
-    );
-  }
-  
-  console.log('Axios configured with baseURL:', axios.defaults.baseURL);
 } catch (error) {
   console.error('Error configuring axios:', error);
 }
