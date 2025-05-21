@@ -12,14 +12,34 @@ export default defineConfig({
   },  server: {
     proxy: {
       '/api': {
-        target: 'https://community-empowerment-hub-313ac18da07a.herokuapp.com',
+        // Use environment variable to switch between local and remote API
+        target: process.env.USE_LOCAL_API === 'true' 
+          ? 'http://localhost:5000' 
+          : 'https://community-empowerment-hub-313ac18da07a.herokuapp.com',
         changeOrigin: true,
         secure: false,
         cookieDomainRewrite: 'localhost',
         configure: (proxy, options) => {
           proxy.on('proxyReq', (proxyReq, req, res) => {
-            // This will enable CORS requests to be proxied correctly
-            proxyReq.setHeader('origin', 'https://community-empowerment-hub-313ac18da07a.herokuapp.com');
+            // Set correct origin header for CORS
+            const target = process.env.USE_LOCAL_API === 'true'
+              ? 'http://localhost:5000'
+              : 'https://community-empowerment-hub-313ac18da07a.herokuapp.com';
+            proxyReq.setHeader('origin', target);
+            
+            // Log proxy requests in development
+            if (process.env.NODE_ENV !== 'production') {
+              console.log(`Proxying ${req.method} ${req.url} → ${target}${req.url}`);
+            }
+          });
+          
+          // Handle proxy errors
+          proxy.on('error', (err, req, res) => {
+            console.error('Proxy error:', err);
+            res.writeHead(500, {
+              'Content-Type': 'text/plain'
+            });
+            res.end(`Proxy error: ${err.message}`);
           });
         }
       },

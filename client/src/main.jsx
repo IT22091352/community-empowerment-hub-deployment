@@ -5,6 +5,8 @@ import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "./store/store.js";
 import { Toaster } from "./components/ui/toaster.jsx";
+import axios from "axios";
+import { API_URL } from "./config/apiConfig";
 // Import TensorFlow compatibility module
 import './utils/tfjs-compat.js';
 // Import startup diagnostics
@@ -40,6 +42,41 @@ if (shouldRunDiagnostics || isHeroku) {
   } catch (error) {
     console.error('Error setting up diagnostics:', error);
   }
+}
+
+// Configure axios globally
+try {
+  // Set axios defaults for consistent API calls
+  axios.defaults.baseURL = API_URL;
+  axios.defaults.withCredentials = true;
+  axios.defaults.timeout = 20000; // 20 seconds timeout
+  
+  // Enable better error logging in development
+  if (typeof process === 'undefined' || !process.env || process.env.NODE_ENV !== 'production') {
+    axios.interceptors.request.use(request => {
+      console.log('Starting API request:', request.method?.toUpperCase(), request.url);
+      return request;
+    });
+    
+    axios.interceptors.response.use(
+      response => {
+        console.log('API response received:', response.status, response.config.url);
+        return response;
+      },
+      error => {
+        console.error('API error response:', 
+          error.response?.status || 'Network Error',
+          error.config?.url,
+          error.response?.data || error.message
+        );
+        return Promise.reject(error);
+      }
+    );
+  }
+  
+  console.log('Axios configured with baseURL:', axios.defaults.baseURL);
+} catch (error) {
+  console.error('Error configuring axios:', error);
 }
 
 createRoot(document.getElementById("root")).render(

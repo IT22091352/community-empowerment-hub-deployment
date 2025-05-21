@@ -63,16 +63,26 @@ export const loginUser = createAsyncThunk(
 export const logoutUser = createAsyncThunk(
   "/auth/logout",
 
-  async () => {
-    const response = await axios.post(
-      "https://community-empowerment-hub-313ac18da07a.herokuapp.com/api/auth/logout",
-      {},
-      {
-        withCredentials: true,
+  async (_, { rejectWithValue }) => {
+    try {
+      console.log("Attempting to logout user...");
+      // Use the same pattern as register and login - relative URL
+      const response = await axios.post(
+        "/api/auth/logout",
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+      console.log("Logout successful");
+      return response.data;
+    } catch (error) {
+      console.error("Logout error:", error);
+      if (error.response) {
+        return rejectWithValue(error.response.data);
       }
-    );
-
-    return response.data;
+      return rejectWithValue("Logout failed: " + error.message);
+    }
   }
 );
 
