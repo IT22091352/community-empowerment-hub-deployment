@@ -10,7 +10,7 @@ export const addToCart = createAsyncThunk(
   "cart/addToCart",
   async ({ userId, productId, quantity }) => {
     const response = await axios.post(
-      "https://community-empowerment-hub-313ac18da07a.herokuapp.com/api/shop/cart/add",
+      "/api/shop/cart/add",
       {
         userId,
         productId,

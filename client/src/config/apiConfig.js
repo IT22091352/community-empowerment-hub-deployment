@@ -13,17 +13,20 @@ try {
   } 
   // Priority 2: Use production URL directly for production environment
   else if (process.env.NODE_ENV === 'production') {
-    apiBaseUrl = 'https://community-empowerment-hub-313ac18da07a.herokuapp.com/api';
+    // In production, we can use relative URLs if the frontend and API are deployed together
+    // or the full URL if they're on different domains
+    apiBaseUrl = '/api';
     console.log('Using production API URL:', apiBaseUrl);
-  } 
+  }
   // Priority 3: When in development environment
   else {
-    apiBaseUrl = 'https://community-empowerment-hub-313ac18da07a.herokuapp.com/api';
-    console.log('Using development API URL:', apiBaseUrl);
+    // Use relative URL to work with Vite's proxy
+    apiBaseUrl = '/api';
+    console.log('Using development API URL with proxy:', apiBaseUrl);
   }
 } catch (error) {
   console.error('Error determining API URL:', error);
-  apiBaseUrl = 'http://localhost:5000/api';
+  apiBaseUrl = '/api'; // Fallback to relative URL
 }
 
 // Export the base URL for API calls
@@ -35,3 +38,17 @@ export const PRODUCTION_API_URL = `${PRODUCTION_DOMAIN}/api`;
 
 // Export existing configuration
 export * from './index';
+
+
+
+import axios from 'axios';
+
+const apiClient = axios.create({
+  baseURL: apiBaseUrl,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  withCredentials: true,
+});
+
+export default apiClient;

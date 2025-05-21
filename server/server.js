@@ -63,24 +63,41 @@ if (process.env.NODE_ENV === "production") {
 
 const PORT = process.env.PORT || 5000;
 
-// Standard CORS configuration
+// Enhanced CORS configuration for better compatibility
 app.use(
   cors({
-    origin: process.env.NODE_ENV === "production"
-      ? [
-          "https://community-empowerment-hub-313ac18da07a.herokuapp.com",
-          "https://community-empowerment-hub.herokuapp.com"
-        ]
-      : ["http://localhost:5173", "http://127.0.0.1:5173"],
-    methods: ["GET", "POST", "DELETE", "PUT", "OPTIONS"],
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      
+      const allowedOrigins = process.env.NODE_ENV === "production"
+        ? [
+            "https://community-empowerment-hub-313ac18da07a.herokuapp.com",
+            "https://community-empowerment-hub.herokuapp.com"
+          ]
+        : ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174"];
+        
+      if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+        callback(null, true);
+      } else {
+        console.log("Blocked by CORS: ", origin);
+        callback(null, false);
+      }
+    },
+    methods: ["GET", "POST", "DELETE", "PUT", "OPTIONS", "HEAD", "PATCH"],
     allowedHeaders: [
       "Content-Type",
       "Authorization",
+      "X-Requested-With",
+      "Accept",
+      "Origin", 
       "Cache-Control",
       "Expires",
       "Pragma",
     ],
+    exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
     credentials: true,
+    maxAge: 86400,  // Cache preflight request results for 24 hours
   })
 );
 
@@ -89,7 +106,7 @@ app.options('*', cors());
 
 console.log("CORS Configuration:", process.env.NODE_ENV === "production" 
   ? ["https://community-empowerment-hub-313ac18da07a.herokuapp.com"] 
-  : ["http://localhost:5173", "http://127.0.0.1:5173"]);
+  : ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174"]);
 
 app.use(cookieParser());
 app.use(express.json());

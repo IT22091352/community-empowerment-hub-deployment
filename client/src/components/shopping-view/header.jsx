@@ -83,6 +83,16 @@ function HeaderRightContent() {
 
   return (
     <div className="flex lg:items-center lg:flex-row flex-col gap-4">
+      {/* Add Developer Diagnostic Link */}
+      {process.env.NODE_ENV !== "production" && (
+        <Link
+          to="/shop/api-diagnostic"
+          className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded hover:bg-purple-200"
+        >
+          API Diagnostic
+        </Link>
+      )}
+
       <Sheet open={openCartSheet} onOpenChange={() => setOpenCartSheet(false)}>
         <Button
           onClick={() => setOpenCartSheet(true)}

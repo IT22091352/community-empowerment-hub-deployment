@@ -81,7 +81,16 @@ const loginUser = async (req, res) => {
       { expiresIn: "60m" }
     );
 
-    res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production" }).json({
+    // Set secure and domain options for cookies based on environment
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax',
+      // Don't set specific domain in development to work with localhost
+      ...(process.env.NODE_ENV === "production" && { domain: '.herokuapp.com' })
+    };
+
+    res.cookie("token", token, cookieOptions).json({
       success: true,
       message: "Logged in successfully",
       user: {

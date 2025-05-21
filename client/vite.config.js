@@ -9,10 +9,25 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+  },  server: {
+    proxy: {
+      '/api': {
+        target: 'https://community-empowerment-hub-313ac18da07a.herokuapp.com',
+        changeOrigin: true,
+        secure: false,
+        cookieDomainRewrite: 'localhost',
+        configure: (proxy, options) => {
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            // This will enable CORS requests to be proxied correctly
+            proxyReq.setHeader('origin', 'https://community-empowerment-hub-313ac18da07a.herokuapp.com');
+          });
+        }
+      },
+    },
   },
   optimizeDeps: {
     include: ['jspdf', 'jspdf-autotable']
-  },  build: {
+  },build: {
     commonjsOptions: {
       include: [/node_modules/],
     },

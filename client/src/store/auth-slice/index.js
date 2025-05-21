@@ -12,7 +12,7 @@ export const registerUser = createAsyncThunk(
 
   async (formData) => {
     const response = await axios.post(
-      "https://community-empowerment-hub-313ac18da07a.herokuapp.com/api/auth/register",
+      "/api/auth/register",
       formData,
       {
         withCredentials: true,
@@ -28,7 +28,7 @@ export const loginUser = createAsyncThunk(
 
   async (formData) => {
     const response = await axios.post(
-      "https://community-empowerment-hub-313ac18da07a.herokuapp.com/api/auth/login",
+      "/api/auth/login",
       formData,
       {
         withCredentials: true,
@@ -60,7 +60,7 @@ export const checkAuth = createAsyncThunk(
 
   async () => {
     const response = await axios.get(
-      "https://community-empowerment-hub-313ac18da07a.herokuapp.com/api/auth/check-auth",
+      "/api/auth/check-auth",
       {
         withCredentials: true,
         headers: {

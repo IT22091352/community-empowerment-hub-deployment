@@ -15,10 +15,8 @@ export const fetchAllFilteredProducts = createAsyncThunk(
     const query = new URLSearchParams({
       ...filterParams,
       sortBy: sortParams,
-    });
-
-    const result = await axios.get(
-      `https://community-empowerment-hub-313ac18da07a.herokuapp.com/api/shop/products/get?${query}`
+    });    const result = await axios.get(
+      `/api/shop/products/get?${query}`
     );
 
     console.log(result);

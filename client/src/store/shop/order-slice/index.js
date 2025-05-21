@@ -13,7 +13,7 @@ export const createNewOrder = createAsyncThunk(
   "/order/createNewOrder",
   async (orderData) => {
     const response = await axios.post(
-      "https://community-empowerment-hub-313ac18da07a.herokuapp.com/api/shop/order/create",
+      "/api/shop/order/create",
       orderData
     );
 

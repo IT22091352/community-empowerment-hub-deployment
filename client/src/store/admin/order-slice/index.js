@@ -10,7 +10,7 @@ export const getAllOrdersForAdmin = createAsyncThunk(
   "/order/getAllOrdersForAdmin",
   async () => {
     const response = await axios.get(
-      `https://community-empowerment-hub-313ac18da07a.herokuapp.com/api/admin/orders/get`
+      `/api/admin/orders/get`
     );
 
     return response.data;

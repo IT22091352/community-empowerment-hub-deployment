@@ -27,6 +27,7 @@ import LandingPage from "./pages/shopping-view/landing";
 import AIBusinessAdvisorTool from "./pages/shopping-view/ai-tool";
 import JobPortal from "./pages/shopping-view/jobportal";
 import ApiHealthIndicator from "./components/common/ApiHealthIndicator";
+import ApiDiagnosticPage from "./pages/shopping-view/api-diagnostic";  // Add this import
 
 
 function App() {
@@ -100,6 +101,7 @@ function App() {
           <Route path="listing" element={<ShoppingListing />} />
           <Route path="checkout" element={<ShoppingCheckout />} />
           <Route path="account" element={<ShoppingAccount />} />
+          <Route path="api-diagnostic" element={<ApiDiagnosticPage />} />  {/* Add this route */}
           {/* <Route path="paypal-return" element={<PaypalReturnPage />} /> */}
           <Route path="payment-success" element={<PaymentSuccessPage />} />
           <Route path="search" element={<SearchProducts />} />

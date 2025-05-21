@@ -12,18 +12,16 @@
   let apiUrl;
   if (isHeroku || !isLocalhost) {
     // Production - use current domain
-    apiUrl = `${currentDomain}/api`;
-  } else {
-    // Local development - use localhost:5000
-    apiUrl = 'https://community-empowerment-hub-313ac18da07a.herokuapp.com/api';
+    apiUrl = `${currentDomain}/api`;  } else {
+    // Local development - use relative URL with Vite proxy
+    apiUrl = '/api';
   }
   
   // Make environment configuration available globally
-  window.ENV = {
-    // API URLs for different environments
+  window.ENV = {    // API URLs for different environments
     API_URL: apiUrl,
     PRODUCTION_API_URL: `${PRODUCTION_DOMAIN}/api`,
-    LOCAL_API_URL: 'https://community-empowerment-hub-313ac18da07a.herokuapp.com/api',
+    LOCAL_API_URL: '/api',
     
     // Domain information
     APP_DOMAIN: window.location.hostname,
