@@ -43,17 +43,14 @@ const loginUser = async (req, res) => {
   try {
     const checkUser = await User.findOne({ email });
     if (!checkUser)
-      return res.json({
+      return res.status(404).json({
         success: false,
-        message: "User doesn't exists! Please register first",
+        message: "User doesn't exist! Please register first",
       });
 
-    const checkPasswordMatch = await bcrypt.compare(
-      password,
-      checkUser.password
-    );
+    const checkPasswordMatch = await bcrypt.compare(password, checkUser.password);
     if (!checkPasswordMatch)
-      return res.json({
+      return res.status(401).json({
         success: false,
         message: "Incorrect password! Please try again",
       });
@@ -65,11 +62,11 @@ const loginUser = async (req, res) => {
         email: checkUser.email,
         userName: checkUser.userName,
       },
-      "CLIENT_SECRET_KEY",
+      process.env.JWT_SECRET || "default_secret_key",
       { expiresIn: "60m" }
     );
 
-    res.cookie("token", token, { httpOnly: true, secure: false }).json({
+    res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production" }).json({
       success: true,
       message: "Logged in successfully",
       user: {
@@ -79,11 +76,11 @@ const loginUser = async (req, res) => {
         userName: checkUser.userName,
       },
     });
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.error("Error during login:", error);
     res.status(500).json({
       success: false,
-      message: "Some error occured",
+      message: "An unexpected error occurred. Please try again later.",
     });
   }
 };
