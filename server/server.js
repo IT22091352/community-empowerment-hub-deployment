@@ -84,6 +84,9 @@ app.use(
   })
 );
 
+// Explicitly handle OPTIONS requests for CORS preflight
+app.options('*', cors());
+
 console.log("CORS Configuration:", process.env.NODE_ENV === "production" 
   ? ["https://community-empowerment-hub-313ac18da07a.herokuapp.com"] 
   : ["http://localhost:5173", "http://127.0.0.1:5173"]);
