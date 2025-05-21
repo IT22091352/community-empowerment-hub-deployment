@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../../models/User");
+const { check, validationResult } = require("express-validator");
 
 //register
 const registerUser = async (req, res) => {
@@ -38,22 +39,36 @@ const registerUser = async (req, res) => {
 
 //login
 const loginUser = async (req, res) => {
-  const { email, password } = req.body;
-
   try {
+    // Validate request payload
+    await check("email", "Valid email is required").isEmail().run(req);
+    await check("password", "Password is required").notEmpty().run(req);
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array(),
+      });
+    }
+
+    const { email, password } = req.body;
+
     const checkUser = await User.findOne({ email });
-    if (!checkUser)
+    if (!checkUser) {
       return res.status(404).json({
         success: false,
         message: "User doesn't exist! Please register first",
       });
+    }
 
     const checkPasswordMatch = await bcrypt.compare(password, checkUser.password);
-    if (!checkPasswordMatch)
+    if (!checkPasswordMatch) {
       return res.status(401).json({
         success: false,
         message: "Incorrect password! Please try again",
       });
+    }
 
     const token = jwt.sign(
       {
