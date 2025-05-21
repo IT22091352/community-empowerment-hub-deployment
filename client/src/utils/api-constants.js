@@ -9,7 +9,7 @@
 export const PRODUCTION_DOMAIN = 'https://community-empowerment-hub-313ac18da07a.herokuapp.com';
 
 // Development API URL
-export const DEV_API_URL = 'http://localhost:5000/api';
+export const DEV_API_URL = 'https://community-empowerment-hub-313ac18da07a.herokuapp.com/api';
 
 // Helper function to determine environment
 export const isProduction = () => {
@@ -24,11 +24,7 @@ export const isProduction = () => {
 export const getBaseDomain = () => {
   if (typeof window !== 'undefined') {
     // If we're in the browser
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      return 'http://localhost:5000';
-    } else {
-      return window.location.origin;
-    }
+    return window.location.origin;
   } 
   return PRODUCTION_DOMAIN;
 };

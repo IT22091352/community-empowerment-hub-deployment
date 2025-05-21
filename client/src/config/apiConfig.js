@@ -18,7 +18,7 @@ try {
   } 
   // Priority 3: When in development environment
   else {
-    apiBaseUrl = 'http://localhost:5000/api';
+    apiBaseUrl = 'https://community-empowerment-hub-313ac18da07a.herokuapp.com/api';
     console.log('Using development API URL:', apiBaseUrl);
   }
 } catch (error) {
